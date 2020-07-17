@@ -6,7 +6,7 @@ options:
   substitution_option: ALLOW_LOOSE
 
 steps:
-  - name: "docker:19.03"
+  - name: "crazy-max/ghaction-docker-buildx"
     env:
       - DOCKER_CLI_EXPERIMENTAL=enabled
     entrypoint: 'docker'
