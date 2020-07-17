@@ -65,6 +65,15 @@ build.docker:
 build.mini:
 	docker build --rm --tag "$(IMAGE):$(VERSION)-mini" --build-arg VERSION="$(VERSION)" -f Dockerfile.mini .
 
+buildx.create:
+	docker buildx create --name builder --platform=linux/amd64,linux/arm64 
+
+buildx.use:
+	docker buildx use builder
+
+buildx.docker:
+	docker buildx --platform linux/arm64,linux/amd64
+
 clean:
 	@rm -rf build
 
@@ -76,3 +85,6 @@ release.staging:
 
 release.prod:
 	$(MAKE) build.docker build.push
+
+release.test:
+	buildx.create buildx.use buildx.docker
