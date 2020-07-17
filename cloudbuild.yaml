@@ -9,4 +9,5 @@ steps:
   - name: "docker:19.03"
     env:
       - DOCKER_CLI_EXPERIMENTAL=enabled
+    entrypoint: 'docker'
     args: ['buildx', 'create', '--name', 'builder', '--platform=linux/amd64,linux/arm64' ]
