@@ -1,0 +1,49 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Prepare
+      id: prepare
+      run:
+        DOCKER_IMAGE=timtor/external-dns
+        DOCKER_PLATFORMS=linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/386,linux/ppc64le,linux/s390x
+        VERSON=edge
+
+        echo ::set-output name=docker_image::${DOCKER_IMAGE}
+        echo ::set-output name=buildx_args::\
+          --platform ${DOCKER_PLATFORMS}\
+          --push\
+          --tag "${DOCKER_IMAGE}:${VERSION}"\
+          --file .
+
+    - name: Set up docker buildx
+      id: buildx
+      uses: crazy-max/ghaction-docker-buildx@v3
+      with:
+        buildx-version: latest
+        qemu-version: latest
+
+    - name: Display available platforms
+      run: echo ${{ steps.buildx.outputs.platforms }}
+    
+    - name: Dockerhub login
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+
+    - name: Build and push docker image
+      run: |
+        docker buildx build ${{ steps.prepare.outputs.buildx_args }}
+
+
