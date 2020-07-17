@@ -7,10 +7,6 @@ options:
 
 steps:
   - name: "docker:19.03"
-    entrypoint: make
     env:
       - DOCKER_CLI_EXPERIMENTAL=enabled
-      - VERSION=$_GIT_TAG
-      - PULL_BASE_REF=$_PULL_BASE_REF
-    args:
-      - release.test
+    args: ['buildx', 'create', '--name', 'builder', '--platform=linux/amd64,linux/arm64' ]
